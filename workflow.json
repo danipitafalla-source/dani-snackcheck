@@ -21,42 +21,6 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "loose",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "638a5bfc-132c-41b3-a84e-9d09059ebd69",
-              "leftValue": "={{ $json.body.barcode }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "empty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "looseTypeValidation": true,
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        224,
-        0
-      ],
-      "id": "8b7fac7a-2588-4896-8345-5d40be254b9d",
-      "name": "\tValidate - Barcode Not Empty",
-      "notes": "\tSi falta el barcode, responde con instrucciones de uso"
-    },
-    {
-      "parameters": {
         "respondWith": "json",
         "responseBody": "={\n  \"message\": \"Bienvenido a SnackCheck. Envía un código de barras para saber si un producto es saludable.\",\n  \"how_to_use\": {\n    \"method\": \"POST\",\n    \"body_example\": { \"barcode\": \"3017620422003\" }\n  }\n}\n",
         "options": {}
@@ -70,40 +34,6 @@
       "id": "30fd84ee-f271-4549-a609-85ebbb5a1575",
       "name": "Respond - Welcome Docs",
       "notes": "JSON autoexplicativo, 200"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "021c94f0-1d8f-497a-b3a6-7d1bf2ef239c",
-              "leftValue": "={{ $json.body.barcode }}",
-              "rightValue": "^[0-9]+$",
-              "operator": {
-                "type": "string",
-                "operation": "regex"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        448,
-        96
-      ],
-      "id": "6cb8669a-c055-47ec-ba46-9f960dfa6c85",
-      "name": "\tValidate - Barcode Is Numeric",
-      "notes": "Regex ^[0-9]+$"
     },
     {
       "parameters": {
@@ -363,31 +293,6 @@
     },
     {
       "parameters": {
-        "respondWith": "text",
-        "responseBody": "={{ $json.text }}\n\n📊 Datos clave:\n{{ $('Calculate - Traffic Light Levels').item.json.sugar_level === 'alto' ? '🔴' : $('Calculate - Traffic Light Levels').item.json.sugar_level === 'medio' ? '🟡' : '🟢' }} Azúcar: {{ $('Calculate - Traffic Light Levels').item.json.sugar_level }}\n{{ $('Calculate - Traffic Light Levels').item.json.salt_level === 'alto' ? '🔴' : '🟢' }} Sal: {{ $('Calculate - Traffic Light Levels').item.json.salt_level }}\n{{ $('Calculate - Traffic Light Levels').item.json.fat_level === 'alto' ? '🔴' : '🟢' }} Grasa: {{ $('Calculate - Traffic Light Levels').item.json.fat_level }}\n🔥 Energía: {{ $('Calculate - Traffic Light Levels').item.json.energy_kcal }} kcal/100g\n",
-        "options": {
-          "responseHeaders": {
-            "entries": [
-              {
-                "name": "=Content-Type",
-                "value": "=text/plain; charset=utf-8"
-              }
-            ]
-          }
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        2992,
-        -176
-      ],
-      "id": "421bdb7a-d60d-42e7-ab23-35d88219df91",
-      "name": "\tRespond - Final Verdict",
-      "notes": "Texto plano con el veredicto de la IA"
-    },
-    {
-      "parameters": {
         "assignments": {
           "assignments": [
             {
@@ -421,7 +326,8 @@
         -176
       ],
       "id": "515a5d67-ad67-4a41-9c1c-076697d5de14",
-      "name": "Merge - Combine Readings"
+      "name": "Merge - Combine Readings",
+      "notes": "Combina las 2 lecturas independientes (semáforo + Nutri-Score) antes de consolidarlas"
     },
     {
       "parameters": {
@@ -437,6 +343,101 @@
       "name": "Calculate - Overall Health Level",
       "notesInFlow": true,
       "notes": "Consolida los 2 ítems del Merge (semáforo + Nutri-Score) en 1 solo, nivel final = el peor de los dos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "021c94f0-1d8f-497a-b3a6-7d1bf2ef239c",
+              "leftValue": "={{ $json.body.barcode }}",
+              "rightValue": "^[0-9]+$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        96
+      ],
+      "id": "6cb8669a-c055-47ec-ba46-9f960dfa6c85",
+      "name": "Validate - Barcode Is Numeric",
+      "notes": "Regex ^[0-9]+$"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "638a5bfc-132c-41b3-a84e-9d09059ebd69",
+              "leftValue": "={{ $json.body.barcode }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8b7fac7a-2588-4896-8345-5d40be254b9d",
+      "name": "Validate - Barcode Not Empty",
+      "notes": "\tSi falta el barcode, responde con instrucciones de uso"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.text }}\n\n📊 Datos clave:\n{{ $('Calculate - Traffic Light Levels').item.json.sugar_level === 'alto' ? '🔴' : $('Calculate - Traffic Light Levels').item.json.sugar_level === 'medio' ? '🟡' : '🟢' }} Azúcar: {{ $('Calculate - Traffic Light Levels').item.json.sugar_level }}\n{{ $('Calculate - Traffic Light Levels').item.json.salt_level === 'alto' ? '🔴' : '🟢' }} Sal: {{ $('Calculate - Traffic Light Levels').item.json.salt_level }}\n{{ $('Calculate - Traffic Light Levels').item.json.fat_level === 'alto' ? '🔴' : '🟢' }} Grasa: {{ $('Calculate - Traffic Light Levels').item.json.fat_level }}\n🔥 Energía: {{ $('Calculate - Traffic Light Levels').item.json.energy_kcal }} kcal/100g\n",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "=Content-Type",
+                "value": "=text/plain; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2992,
+        -176
+      ],
+      "id": "421bdb7a-d60d-42e7-ab23-35d88219df91",
+      "name": "Respond - Final Verdict",
+      "notes": "Texto plano con el veredicto de la IA"
     }
   ],
   "pinData": {},
@@ -445,43 +446,7 @@
       "main": [
         [
           {
-            "node": "\tValidate - Barcode Not Empty",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "\tValidate - Barcode Not Empty": {
-      "main": [
-        [
-          {
-            "node": "Respond - Welcome Docs",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "\tValidate - Barcode Is Numeric",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "\tValidate - Barcode Is Numeric": {
-      "main": [
-        [
-          {
-            "node": "Fetch - Product From OpenFoodFacts",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Respond - Invalid Format 400",
+            "node": "Validate - Barcode Not Empty",
             "type": "main",
             "index": 0
           }
@@ -566,7 +531,7 @@
       "main": [
         [
           {
-            "node": "\tRespond - Final Verdict",
+            "node": "Respond - Final Verdict",
             "type": "main",
             "index": 0
           }
@@ -616,6 +581,42 @@
           }
         ]
       ]
+    },
+    "Validate - Barcode Is Numeric": {
+      "main": [
+        [
+          {
+            "node": "Fetch - Product From OpenFoodFacts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond - Invalid Format 400",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate - Barcode Not Empty": {
+      "main": [
+        [
+          {
+            "node": "Respond - Welcome Docs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validate - Barcode Is Numeric",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -623,7 +624,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "021fd99b-7c2b-465e-855d-e4b53bc41706",
+  "versionId": "fa4a24cd-761b-4668-9cd8-74124ef8d5e7",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "24379a6c2039d7964a47aa9411e5001e2c937f6e1e0ed753100eb45a11971da1"
